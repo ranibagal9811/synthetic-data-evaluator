@@ -1,0 +1,10 @@
+# FALLBACK for Streamlit Community Cloud if the full build fails (no SDV / PyTorch).
+# Model advisor, Study results and About tabs work; "Evaluate your data" will show an error.
+# To use: copy this file's contents into requirements.txt, commit and push.
+streamlit>=1.50
+fpdf2>=2.7
+plotly>=5.20
+scikit-learn>=1.3
+scipy>=1.11
+pandas>=2.0
+numpy>=1.24
