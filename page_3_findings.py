@@ -26,7 +26,7 @@ with st.container(border=True):
     st.markdown(f"""
 - With the study's default of **300 epochs**, Gaussian Copula had the higher SDV quality score at every dataset size and class ratio (p < 0.001), and higher classifier utility in nearly all of them
   (the exception: at 10% minority share neither was reliable). At 768 rows its SDV score was **{F['cop_sdv_overall']:.3f}** vs **{F['k300_sdv_overall']:.3f}** and its TSTR AUC **{F['cop_tstr_auc']:.3f}** vs **{F['k300_tstr_auc']:.3f}** (p < 0.001).
-- CTGAN **catches up with much longer training**: at **1000 epochs** its TSTR AUC (**{F['k1000_tstr_auc']:.3f}**) is above Copula's, and from **2000 epochs** its SDV score ({F['k2000_sdv_overall']:.3f}) is higher too.
+- CTGAN **catches up with much longer training**: at **1000 epochs** its TSTR AUC (**{F['k1000_tstr_auc']:.3f}**) is above Copula's, and at **3000 epochs** its SDV score ({F['k3000_sdv_overall']:.3f}) is higher too (at 2000 epochs, {F['k2000_sdv_overall']:.3f}, the difference does not survive correction for multiple testing).
 - CTGAN **distorts an imbalanced class ratio**: with the natural data, about **{100 * F['k1000_pos_rate_synth']:.0f}%** of its synthetic patients are diabetic vs **{100 * F['k1000_pos_rate_real']:.0f}%** in the real data, at every epoch count
   (it passes only when the data is already 50/50). Copula keeps the ratio (chi-square passed in {100 * F['cop_chi2_pass']:.0f}% of runs vs {100 * F['k1000_chi2_pass']:.0f}% for CTGAN).
 - Speed: Copula takes about **{F['cop_seconds']:.0f} s**; CTGAN about **{F['k1000_seconds']:.0f} s** at 1000 epochs and **{F['k3000_seconds']:.0f} s** at 3000 (on a GPU).
@@ -39,14 +39,14 @@ with st.container(border=True):
 - **But synthetic rows get closer to the real training rows as fidelity rises** (ρ = {F['rho_sdv_dcr']:.2f} between SDV score and DCR ratio).
   For CTGAN the DCR ratio falls from **{F['k1000_dcr_ratio']:.2f}** (1000 epochs) to **{F['k2000_dcr_ratio']:.2f}** (2000) and **{F['k3000_dcr_ratio']:.2f}** (3000), and near-copies rise from
   {100 * F['k1000_dcr_pct_near']:.1f}% to {100 * F['k3000_dcr_pct_near']:.1f}% of rows. Only **{F['n_dcr_low']}** of {F['n_runs']} runs fell below DCR = 1.
-- **Knee at about 1000 epochs:** beyond it CTGAN's fidelity keeps rising, but its classifier utility stops improving (and falls at 3000 epochs) while records move closer to the training data.
+- **Diminishing returns beyond about 1000-2000 epochs:** CTGAN's fidelity keeps rising, but its classifier utility stops improving (and falls at 3000 epochs) while records move closer to the training data. This is a plateau, not a sharp threshold: no fidelity level was found at which attacks begin to succeed.
 - **Proposed compliance criterion:** DCR ratio ≥ 1, no exact copies, and attack scores within the range seen for non-leaking data. No fixed fidelity level was found at which attacks begin to succeed.
 """)
 with st.container(border=True):
     st.markdown("#### RQ3 - Which generator should I use?  **Default to Gaussian Copula; use CTGAN only for classifier utility, with ~1000 epochs.**")
     st.markdown(f"""
 1. **Default: Gaussian Copula** - higher fidelity than CTGAN at 300 epochs or fewer, preserves class balance, runs in seconds, works with small data.
-2. **CTGAN only if** your goal is downstream classifier accuracy **and** you can train for about **1000 epochs** (GPU): TSTR AUC **{F['k1000_tstr_auc']:.3f}** vs **{F['cop_tstr_auc']:.3f}** for Copula, at a safe DCR ratio of **{F['k1000_dcr_ratio']:.2f}**.
+2. **CTGAN only if** your goal is downstream classifier accuracy **and** you can train for about **1000 epochs** (GPU): TSTR AUC **{F['k1000_tstr_auc']:.3f}** vs **{F['cop_tstr_auc']:.3f}** for Copula, with a DCR ratio of **{F['k1000_dcr_ratio']:.2f}** (above the DCR = 1 screening criterion).
 3. **Avoid CTGAN at 300 epochs or fewer** - worse than Copula on fidelity and, in nearly all settings, on classifier utility.
 4. **At ~10% minority share** neither generator gave reliable classifier utility.
 """)
